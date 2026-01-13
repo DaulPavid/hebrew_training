@@ -84,3 +84,7 @@ src/
 ├── types/              # TypeScript interfaces
 └── views/              # Page components
 ```
+
+## Acknowledgements
+
+Inspired by [hebrew-touch-typing](https://github.com/dlvhdr/hebrew-touch-typing) by [@dlvhdr](https://github.com/dlvhdr).
