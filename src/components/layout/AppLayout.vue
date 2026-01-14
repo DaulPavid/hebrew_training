@@ -2,10 +2,10 @@
 import Sidebar from './Sidebar.vue'
 
 const emit = defineEmits<{
-  'mode-change': [mode: 'typing' | 'vocab']
+  'mode-change': [mode: 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation']
 }>()
 
-function handleModeChange(mode: 'typing' | 'vocab') {
+function handleModeChange(mode: 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation') {
   emit('mode-change', mode)
 }
 </script>

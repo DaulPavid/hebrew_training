@@ -1,55 +1,76 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
-import { useVocabStore } from '@/stores/vocabStore'
-import VocabCard from '@/components/vocab/VocabCard.vue'
+import { ref, computed, onMounted } from 'vue'
+import { getRandomPhrases, type Phrase } from '@/data/phrases'
+import PhraseTypingCard from '@/components/phrase/PhraseTypingCard.vue'
 
-const vocabStore = useVocabStore()
+// Session settings
+const SESSION_SIZE = 10
 
-// Start session on mount
-onMounted(() => {
-  vocabStore.startSession()
+// Session state
+const queue = ref<Phrase[]>([])
+const completedCount = ref(0)
+const totalAccuracy = ref(0)
+
+// Current phrase
+const currentPhrase = computed(() => queue.value[0] ?? null)
+
+// Is session complete?
+const isSessionComplete = computed(() => {
+  return completedCount.value > 0 && queue.value.length === 0
 })
 
-// Handle card completion
-function handleComplete(correct: boolean) {
-  vocabStore.recordAnswer(correct)
-}
-
-// Session complete view
-const isSessionComplete = computed(() => {
-  return !vocabStore.hasMoreToReview && vocabStore.sessionStats.total > 0
+// Average accuracy
+const averageAccuracy = computed(() => {
+  if (completedCount.value === 0) return 0
+  return Math.round(totalAccuracy.value / completedCount.value)
 })
 
 // Start a new session
-function startNewSession() {
-  vocabStore.startSession()
+function startSession() {
+  queue.value = getRandomPhrases(SESSION_SIZE)
+  completedCount.value = 0
+  totalAccuracy.value = 0
 }
+
+// Handle phrase completion
+function handleComplete(_correct: boolean, accuracy: number) {
+  completedCount.value++
+  totalAccuracy.value += accuracy
+  // Remove completed phrase from queue
+  queue.value = queue.value.slice(1)
+}
+
+// Start on mount
+onMounted(() => {
+  startSession()
+})
 </script>
 
 <template>
-  <div class="vocab-drill">
+  <div class="phrase-view">
     <!-- Header with stats -->
-    <div class="vocab-drill__header">
-      <h1>תרגול אוצר מילים</h1>
-      <div class="vocab-drill__stats">
-        <div class="vocab-drill__stat">
-          <span class="vocab-drill__stat-value">{{ vocabStore.learnedCount }}</span>
-          <span class="vocab-drill__stat-label">נלמדו</span>
+    <div class="phrase-view__header">
+      <h1>הקלדת ביטויים</h1>
+      <p class="phrase-view__subtitle">Type common Hebrew phrases</p>
+      <div class="phrase-view__stats">
+        <div class="phrase-view__stat">
+          <span class="phrase-view__stat-value">{{ completedCount }}</span>
+          <span class="phrase-view__stat-label">הושלמו</span>
         </div>
-        <div class="vocab-drill__stat">
-          <span class="vocab-drill__stat-value">{{ vocabStore.masteredCount }}</span>
-          <span class="vocab-drill__stat-label">שולטים</span>
+        <div class="phrase-view__stat">
+          <span class="phrase-view__stat-value">{{ queue.length }}</span>
+          <span class="phrase-view__stat-label">נותרו</span>
         </div>
-        <div class="vocab-drill__stat">
-          <span class="vocab-drill__stat-value">{{ vocabStore.sessionStats.remaining }}</span>
-          <span class="vocab-drill__stat-label">נותרו</span>
+        <div class="phrase-view__stat">
+          <span class="phrase-view__stat-value">{{ averageAccuracy }}%</span>
+          <span class="phrase-view__stat-label">דיוק</span>
         </div>
       </div>
     </div>
 
     <!-- Session complete -->
-    <div v-if="isSessionComplete" class="vocab-drill__complete">
-      <svg class="vocab-drill__trophy" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <div v-if="isSessionComplete" class="phrase-view__complete">
+      <svg class="phrase-view__trophy" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M32 8L38 24H54L41 34L47 50L32 40L17 50L23 34L10 24H26L32 8Z"
           fill="#fbbf24"
@@ -57,63 +78,62 @@ function startNewSession() {
           stroke-width="2"
         />
       </svg>
-      <h2>כל הכבוד!</h2>
-      <p>סיימת את התרגול להיום</p>
-      <div class="vocab-drill__session-stats">
-        <p>מילים חדשות: {{ vocabStore.sessionStats.newLearned }}</p>
-        <p>חזרות: {{ vocabStore.sessionStats.reviewed }}</p>
+      <h2>מעולה!</h2>
+      <p>סיימת את תרגול הביטויים</p>
+      <div class="phrase-view__session-stats">
+        <p>הקלדת: {{ completedCount }} ביטויים</p>
+        <p>דיוק ממוצע: {{ averageAccuracy }}%</p>
       </div>
-      <button class="vocab-drill__btn" @click="startNewSession">
+      <button class="phrase-view__btn" @click="startSession">
         התחל שוב
       </button>
     </div>
 
-    <!-- No items to review -->
-    <div v-else-if="!vocabStore.currentItem" class="vocab-drill__empty">
-      <h2>אין מילים לתרגול</h2>
-      <p>חזור מאוחר יותר או התחל מחדש</p>
-      <button class="vocab-drill__btn" @click="startNewSession">
+    <!-- No phrases (edge case) -->
+    <div v-else-if="!currentPhrase" class="phrase-view__empty">
+      <h2>אין ביטויים</h2>
+      <button class="phrase-view__btn" @click="startSession">
         התחל תרגול
       </button>
     </div>
 
-    <!-- Active drilling -->
-    <VocabCard
+    <!-- Active phrase -->
+    <PhraseTypingCard
       v-else
-      :item="vocabStore.currentItem"
+      :phrase="currentPhrase"
       @complete="handleComplete"
     />
 
     <!-- Progress bar -->
-    <div v-if="vocabStore.currentItem" class="vocab-drill__progress">
-      <div class="vocab-drill__progress-bar">
+    <div v-if="currentPhrase" class="phrase-view__progress">
+      <div class="phrase-view__progress-bar">
         <div
-          class="vocab-drill__progress-fill"
-          :style="{ width: `${(vocabStore.sessionStats.total / (vocabStore.sessionStats.total + vocabStore.sessionStats.remaining)) * 100}%` }"
+          class="phrase-view__progress-fill"
+          :style="{ width: `${(completedCount / SESSION_SIZE) * 100}%` }"
         />
       </div>
-      <span class="vocab-drill__progress-text">
-        {{ vocabStore.sessionStats.total }} / {{ vocabStore.sessionStats.total + vocabStore.sessionStats.remaining }}
+      <span class="phrase-view__progress-text">
+        {{ completedCount }} / {{ SESSION_SIZE }}
       </span>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.vocab-drill {
+.phrase-view {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 32px;
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   direction: rtl;
 
   &__header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
     width: 100%;
 
     h1 {
@@ -124,9 +144,17 @@ function startNewSession() {
     }
   }
 
+  &__subtitle {
+    font-size: 1em;
+    color: #666;
+    margin: 0;
+    direction: ltr;
+  }
+
   &__stats {
     display: flex;
     gap: 24px;
+    margin-top: 8px;
   }
 
   &__stat {

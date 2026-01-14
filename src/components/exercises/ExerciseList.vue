@@ -63,6 +63,7 @@ function toggleExpanded() {
     cursor: pointer;
     border: none;
     font-size: 1em;
+    color: #333;
 
     &:hover {
       background: #f3dece;

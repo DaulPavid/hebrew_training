@@ -4,11 +4,15 @@ import { useExerciseStore } from '@/stores/exerciseStore'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import ExerciseView from '@/views/ExerciseView.vue'
 import VocabDrillView from '@/views/VocabDrillView.vue'
+import TranslationView from '@/views/TranslationView.vue'
+import SentenceCompletionView from '@/views/SentenceCompletionView.vue'
+import PhraseTypingView from '@/views/PhraseTypingView.vue'
+import DictationView from '@/views/DictationView.vue'
 
 const exerciseStore = useExerciseStore()
 
 // Current mode
-type AppMode = 'typing' | 'vocab'
+type AppMode = 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation'
 const currentMode = ref<AppMode>('typing')
 
 // Handle mode change from sidebar
@@ -31,6 +35,10 @@ watch(
   <AppLayout @mode-change="handleModeChange">
     <ExerciseView v-if="currentMode === 'typing'" />
     <VocabDrillView v-else-if="currentMode === 'vocab'" />
+    <TranslationView v-else-if="currentMode === 'translation'" />
+    <SentenceCompletionView v-else-if="currentMode === 'sentence'" />
+    <PhraseTypingView v-else-if="currentMode === 'phrase'" />
+    <DictationView v-else-if="currentMode === 'dictation'" />
   </AppLayout>
 </template>
 

@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { VocabItem } from '@/types'
+import type { Phrase } from '@/data/phrases'
 import { useTypingEngine } from '@/composables/useTypingEngine'
 import Letter from '@/components/typing/Letter.vue'
 import TypingInput from '@/components/typing/TypingInput.vue'
 
 const props = defineProps<{
-  item: VocabItem
+  phrase: Phrase
 }>()
 
 const emit = defineEmits<{
   complete: [correct: boolean, accuracy: number]
 }>()
 
-// Target text is the Hebrew word
-const targetText = computed(() => props.item.hebrew)
+// Target text is the Hebrew phrase
+const targetText = computed(() => props.phrase.hebrew)
 
 // Set up typing engine
 const {
@@ -26,27 +26,25 @@ const {
   reset,
 } = useTypingEngine(targetText)
 
-// Track if result has been shown
+// Track result state
 const showResult = ref(false)
 const wasCorrect = ref(false)
 
 // Watch for completion
 watch(isComplete, (complete) => {
   if (complete) {
-    // Consider correct if accuracy >= 80%
     wasCorrect.value = accuracy.value >= 80
     showResult.value = true
 
-    // Emit after a short delay for user to see result
     setTimeout(() => {
       emit('complete', wasCorrect.value, accuracy.value)
     }, 1500)
   }
 })
 
-// Reset when item changes
+// Reset when phrase changes
 watch(
-  () => props.item.id,
+  () => props.phrase.id,
   () => {
     reset()
     showResult.value = false
@@ -56,21 +54,25 @@ watch(
 </script>
 
 <template>
-  <div class="vocab-card">
+  <div class="phrase-card">
     <TypingInput
       v-model="typedText"
       :disabled="showResult"
       @update:model-value="handleInput"
     />
 
-    <!-- English prompt -->
-    <div class="vocab-card__prompt">
-      <span class="vocab-card__english">{{ item.english }}</span>
-      <span class="vocab-card__transliteration">({{ item.transliteration }})</span>
+    <!-- English meaning -->
+    <div class="phrase-card__english">
+      {{ phrase.english }}
     </div>
 
-    <!-- Hebrew letters display -->
-    <div class="vocab-card__hebrew">
+    <!-- Transliteration hint -->
+    <div v-if="!showResult" class="phrase-card__hint">
+      {{ phrase.transliteration }}
+    </div>
+
+    <!-- Hebrew phrase with feedback -->
+    <div class="phrase-card__hebrew">
       <Letter
         v-for="(state, i) in letterStates"
         :key="i"
@@ -82,47 +84,43 @@ watch(
     <!-- Result feedback -->
     <div
       v-if="showResult"
-      class="vocab-card__result"
-      :class="{ 'vocab-card__result--correct': wasCorrect, 'vocab-card__result--incorrect': !wasCorrect }"
+      class="phrase-card__result"
+      :class="{
+        'phrase-card__result--correct': wasCorrect,
+        'phrase-card__result--incorrect': !wasCorrect
+      }"
     >
-      <span v-if="wasCorrect">{{ accuracy }}% - נכון!</span>
-      <span v-else>{{ accuracy }}% - נסה שוב</span>
+      <span v-if="wasCorrect">{{ accuracy }}% - Excellent!</span>
+      <span v-else>
+        {{ accuracy }}% - Keep practicing!
+      </span>
     </div>
-
-    <!-- Category badge -->
-    <div class="vocab-card__category">{{ item.category }}</div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.vocab-card {
+.phrase-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 32px;
+  gap: 20px;
+  padding: 32px 48px;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 400px;
-
-  &__prompt {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
+  min-width: 450px;
 
   &__english {
-    font-size: 2em;
+    font-size: 1.8em;
     font-weight: bold;
     color: #333;
+    text-align: center;
     direction: ltr;
   }
 
-  &__transliteration {
-    font-size: 1.2em;
-    color: #666;
+  &__hint {
+    font-size: 1.1em;
+    color: #888;
     font-style: italic;
     direction: ltr;
   }
@@ -130,19 +128,22 @@ watch(
   &__hebrew {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 4px;
-    font-size: 2.5em;
+    font-size: 2.2em;
     font-family: 'Noto Sans Hebrew', sans-serif;
     direction: rtl;
-    padding: 16px 24px;
+    padding: 20px 28px;
     background: #f8f9fa;
     border-radius: 12px;
     min-height: 80px;
+    min-width: 300px;
     align-items: center;
+    justify-content: center;
   }
 
   &__result {
-    font-size: 1.5em;
+    font-size: 1.3em;
     font-weight: bold;
     padding: 12px 24px;
     border-radius: 8px;
@@ -168,14 +169,6 @@ watch(
       background: #fef2f2;
       color: #991b1b;
     }
-  }
-
-  &__category {
-    font-size: 0.9em;
-    color: #666;
-    background: #e9ecef;
-    padding: 4px 12px;
-    border-radius: 12px;
   }
 }
 </style>

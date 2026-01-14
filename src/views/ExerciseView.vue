@@ -7,6 +7,7 @@ import { useWPM } from '@/composables/useWPM'
 import TextBlock from '@/components/typing/TextBlock.vue'
 import TypingInput from '@/components/typing/TypingInput.vue'
 import KeyboardSvg from '@/components/keyboard/KeyboardSvg.vue'
+import QwertyReference from '@/components/keyboard/QwertyReference.vue'
 import CompletionCard from '@/components/exercises/CompletionCard.vue'
 import HeroSection from '@/components/exercises/HeroSection.vue'
 import { ExerciseType } from '@/data/letterSets'
@@ -155,11 +156,16 @@ function nextExercise() {
       </template>
 
       <!-- Keyboard (for letter exercises) -->
-      <KeyboardSvg
-        v-else-if="isLetterExercise"
-        :current-letter="currentLetter"
-        class="exercise-view__keyboard"
-      />
+      <template v-else-if="isLetterExercise">
+        <KeyboardSvg
+          :current-letter="currentLetter"
+          class="exercise-view__keyboard"
+        />
+        <QwertyReference
+          :current-letter="currentLetter"
+          class="exercise-view__qwerty-reference"
+        />
+      </template>
     </template>
   </div>
 </template>
@@ -199,6 +205,10 @@ function nextExercise() {
     width: 100%;
     max-width: 700px;
     margin-top: 16px;
+  }
+
+  &__qwerty-reference {
+    margin-top: 8px;
   }
 
   &__actions {

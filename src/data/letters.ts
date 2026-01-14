@@ -1,22 +1,14 @@
+import lettersData from './letters.json'
+
 // Hebrew alphabet
-export const HEBREW_LETTERS = [
-  'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י',
-  'ך', 'כ', 'ל', 'ם', 'מ', 'ן', 'נ', 'ס', 'ע',
-  'ף', 'פ', 'ץ', 'צ', 'ק', 'ר', 'ש', 'ת',
-]
+export const HEBREW_LETTERS: string[] = lettersData.hebrewLetters
 
 // Final forms (sofit)
-export const FINAL_LETTERS: Record<string, string> = {
-  'כ': 'ך',
-  'מ': 'ם',
-  'נ': 'ן',
-  'פ': 'ף',
-  'צ': 'ץ',
-}
+export const FINAL_LETTERS: Record<string, string> = lettersData.finalLetters
 
 // Geresh normalization (Windows vs Mac)
-export const WINDOWS_GERESH = "'"
-export const MAC_GERESH = '׳'
+export const WINDOWS_GERESH = lettersData.windowsGeresh
+export const MAC_GERESH = lettersData.macGeresh
 
 /**
  * Normalize geresh (Hebrew apostrophe) differences between platforms

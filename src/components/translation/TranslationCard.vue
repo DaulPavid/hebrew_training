@@ -26,18 +26,16 @@ const {
   reset,
 } = useTypingEngine(targetText)
 
-// Track if result has been shown
+// Track result state
 const showResult = ref(false)
 const wasCorrect = ref(false)
 
 // Watch for completion
 watch(isComplete, (complete) => {
   if (complete) {
-    // Consider correct if accuracy >= 80%
     wasCorrect.value = accuracy.value >= 80
     showResult.value = true
 
-    // Emit after a short delay for user to see result
     setTimeout(() => {
       emit('complete', wasCorrect.value, accuracy.value)
     }, 1500)
@@ -56,51 +54,58 @@ watch(
 </script>
 
 <template>
-  <div class="vocab-card">
+  <div class="translation-card">
     <TypingInput
       v-model="typedText"
       :disabled="showResult"
       @update:model-value="handleInput"
     />
 
-    <!-- English prompt -->
-    <div class="vocab-card__prompt">
-      <span class="vocab-card__english">{{ item.english }}</span>
-      <span class="vocab-card__transliteration">({{ item.transliteration }})</span>
+    <!-- English prompt (what to translate) -->
+    <div class="translation-card__prompt">
+      <div class="translation-card__label">Translate to Hebrew:</div>
+      <div class="translation-card__english">{{ item.english }}</div>
     </div>
 
-    <!-- Hebrew letters display -->
-    <div class="vocab-card__hebrew">
-      <Letter
-        v-for="(state, i) in letterStates"
-        :key="i"
-        :char="state.char"
-        :status="state.status"
-      />
+    <!-- Hebrew answer area -->
+    <div class="translation-card__answer">
+      <div class="translation-card__hebrew">
+        <Letter
+          v-for="(state, i) in letterStates"
+          :key="i"
+          :char="state.char"
+          :status="state.status"
+        />
+      </div>
+      <div v-if="!showResult" class="translation-card__hint">
+        ({{ item.transliteration }})
+      </div>
     </div>
 
     <!-- Result feedback -->
     <div
       v-if="showResult"
-      class="vocab-card__result"
-      :class="{ 'vocab-card__result--correct': wasCorrect, 'vocab-card__result--incorrect': !wasCorrect }"
+      class="translation-card__result"
+      :class="{
+        'translation-card__result--correct': wasCorrect,
+        'translation-card__result--incorrect': !wasCorrect
+      }"
     >
-      <span v-if="wasCorrect">{{ accuracy }}% - נכון!</span>
-      <span v-else>{{ accuracy }}% - נסה שוב</span>
+      <span v-if="wasCorrect">{{ accuracy }}% - Correct!</span>
+      <span v-else>
+        {{ accuracy }}% - The answer was: {{ item.hebrew }}
+      </span>
     </div>
-
-    <!-- Category badge -->
-    <div class="vocab-card__category">{{ item.category }}</div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.vocab-card {
+.translation-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24px;
-  padding: 32px;
+  padding: 32px 48px;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -113,18 +118,25 @@ watch(
     gap: 8px;
   }
 
+  &__label {
+    font-size: 0.9em;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
   &__english {
-    font-size: 2em;
+    font-size: 2.2em;
     font-weight: bold;
     color: #333;
     direction: ltr;
   }
 
-  &__transliteration {
-    font-size: 1.2em;
-    color: #666;
-    font-style: italic;
-    direction: ltr;
+  &__answer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
 
   &__hebrew {
@@ -138,11 +150,20 @@ watch(
     background: #f8f9fa;
     border-radius: 12px;
     min-height: 80px;
+    min-width: 200px;
     align-items: center;
+    justify-content: center;
+  }
+
+  &__hint {
+    font-size: 1em;
+    color: #888;
+    font-style: italic;
+    direction: ltr;
   }
 
   &__result {
-    font-size: 1.5em;
+    font-size: 1.3em;
     font-weight: bold;
     padding: 12px 24px;
     border-radius: 8px;
@@ -168,14 +189,6 @@ watch(
       background: #fef2f2;
       color: #991b1b;
     }
-  }
-
-  &__category {
-    font-size: 0.9em;
-    color: #666;
-    background: #e9ecef;
-    padding: 4px 12px;
-    border-radius: 12px;
   }
 }
 </style>

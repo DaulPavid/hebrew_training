@@ -9,7 +9,7 @@ const progressStore = useProgressStore()
 const vocabStore = useVocabStore()
 
 const emit = defineEmits<{
-  'mode-change': [mode: 'typing' | 'vocab']
+  'mode-change': [mode: 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation']
 }>()
 
 function selectTypingMode() {
@@ -19,6 +19,26 @@ function selectTypingMode() {
 function selectVocabMode() {
   exerciseStore.clearExercise()
   emit('mode-change', 'vocab')
+}
+
+function selectTranslationMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'translation')
+}
+
+function selectSentenceMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'sentence')
+}
+
+function selectPhraseMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'phrase')
+}
+
+function selectDictationMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'dictation')
 }
 </script>
 
@@ -38,6 +58,22 @@ function selectVocabMode() {
         <span v-if="vocabStore.dueItems.length > 0" class="sidebar__badge">
           {{ vocabStore.dueItems.length }}
         </span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectTranslationMode">
+        <span class="sidebar__mode-icon">🔄</span>
+        <span>תרגום</span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectSentenceMode">
+        <span class="sidebar__mode-icon">✏️</span>
+        <span>השלמת משפטים</span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectPhraseMode">
+        <span class="sidebar__mode-icon">💬</span>
+        <span>ביטויים</span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectDictationMode">
+        <span class="sidebar__mode-icon">🎧</span>
+        <span>הכתבה</span>
       </button>
     </div>
 
@@ -91,6 +127,7 @@ function selectVocabMode() {
     font-family: 'Noto Sans Hebrew', sans-serif;
     font-weight: bold;
     margin: 0 0 24px 0;
+    color: #333;
   }
 
   &__modes {

@@ -134,6 +134,8 @@ function handleClick() {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1.1em;
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    color: #333;
     box-shadow: 0 2px 0 #bbb;
   }
 
