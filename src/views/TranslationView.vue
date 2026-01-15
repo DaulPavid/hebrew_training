@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
 import { useVocabStore } from '@/stores/vocabStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import TranslationCard from '@/components/translation/TranslationCard.vue'
+import QwertyReference from '@/components/keyboard/QwertyReference.vue'
 
 const vocabStore = useVocabStore()
+const settingsStore = useSettingsStore()
 
 // Start session on mount
 onMounted(() => {
@@ -77,6 +80,7 @@ function startNewSession() {
     <!-- Active translation -->
     <TranslationCard
       v-else
+      :key="vocabStore.currentItem.id"
       :item="vocabStore.currentItem"
       @complete="handleComplete"
     />
@@ -93,6 +97,26 @@ function startNewSession() {
         {{ vocabStore.sessionStats.total }} / {{ vocabStore.sessionStats.total + vocabStore.sessionStats.remaining }}
       </span>
     </div>
+
+    <!-- Keyboard display -->
+    <QwertyReference
+      v-if="settingsStore.showKeyboard"
+      class="translation-view__keyboard"
+    />
+
+    <!-- Fixed keyboard toggle button -->
+    <button class="translation-view__keyboard-toggle" @click="settingsStore.toggleKeyboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="4" width="20" height="14" rx="2" />
+        <line x1="6" y1="8" x2="6" y2="8" />
+        <line x1="10" y1="8" x2="10" y2="8" />
+        <line x1="14" y1="8" x2="14" y2="8" />
+        <line x1="18" y1="8" x2="18" y2="8" />
+        <line x1="6" y1="12" x2="6" y2="12" />
+        <line x1="18" y1="12" x2="18" y2="12" />
+        <line x1="8" y1="16" x2="16" y2="16" />
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -226,6 +250,42 @@ function startNewSession() {
     &:active {
       transform: translateY(0);
     }
+  }
+
+  &__keyboard-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      color: #666;
+    }
+
+    &:hover {
+      background: #f5f5f5;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+      svg {
+        color: #2e8f94;
+      }
+    }
+  }
+
+  &__keyboard {
+    width: 100%;
+    max-width: 700px;
   }
 
   &__progress {

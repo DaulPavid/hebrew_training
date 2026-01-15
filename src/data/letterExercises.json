@@ -1,5 +1,6 @@
 [
   { "newLetters": ["כ", "ח"], "type": "review" },
+  { "newLetters": ["כ", "ח"], "type": "practice" },
   { "newLetters": ["ג", "ל"], "type": "review" },
   { "newLetters": ["ג", "ל"], "type": "practice" },
   { "newLetters": ["ד", "ך"], "type": "review" },
@@ -14,8 +15,8 @@
   { "newLetters": ["ק", "ן"], "type": "practice" },
   { "newLetters": ["ם", "'"], "type": "review" },
   { "newLetters": ["ם", "'"], "type": "practice" },
-  { "newLetters": ["/", "ט"], "type": "review" },
-  { "newLetters": ["/", "ט"], "type": "practice" },
+  { "newLetters": ["ט", "/"], "type": "review" },
+  { "newLetters": ["ט", "/"], "type": "practice" },
   { "newLetters": ["פ", "א"], "type": "review" },
   { "newLetters": ["פ", "א"], "type": "practice" },
   { "newLetters": ["ה", "צ"], "type": "review" },
@@ -24,8 +25,8 @@
   { "newLetters": ["ב", "ת"], "type": "practice" },
   { "newLetters": ["ס", "ץ"], "type": "review" },
   { "newLetters": ["ס", "ץ"], "type": "practice" },
-  { "newLetters": ["ז", "."], "type": "review" },
-  { "newLetters": ["ז", "."], "type": "practice" },
-  { "newLetters": ["נ", "מ"], "type": "review" },
-  { "newLetters": ["נ", "מ"], "type": "practice" }
+  { "newLetters": ["ז", "נ"], "type": "review" },
+  { "newLetters": ["ז", "נ"], "type": "practice" },
+  { "newLetters": ["מ", "."], "type": "review" },
+  { "newLetters": ["מ", "."], "type": "practice" }
 ]

@@ -24,7 +24,7 @@ export interface LetterExerciseDescriptor {
  */
 export const LETTER_EXERCISE_DESCRIPTORS: LetterExerciseDescriptor[] =
   letterExercisesData.map(item => ({
-    newLetters: item.newLetters as LetterPair,
+    newLetters: [...item.newLetters] as LetterPair,
     type: item.type as typeof ExerciseType.PRACTICE | typeof ExerciseType.REVIEW,
   }))
 

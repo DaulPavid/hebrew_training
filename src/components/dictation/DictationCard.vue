@@ -167,6 +167,7 @@ watch(
     display: flex;
     gap: 12px;
     align-items: center;
+    direction: ltr;
   }
 
   &__play-btn {
@@ -227,6 +228,7 @@ watch(
     background: #f8f9fa;
     border-radius: 12px;
     text-align: center;
+    direction: ltr;
   }
 
   &__answer {
@@ -261,6 +263,7 @@ watch(
     font-weight: bold;
     padding: 16px 24px;
     border-radius: 8px;
+    direction: ltr;
     animation: pop-in 0.3s ease-out;
 
     @keyframes pop-in {
@@ -298,6 +301,7 @@ watch(
     padding: 12px;
     background: #fef2f2;
     border-radius: 8px;
+    direction: ltr;
   }
 }
 </style>

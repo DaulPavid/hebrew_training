@@ -33,7 +33,7 @@ export const useExerciseStore = defineStore('exercise', () => {
         type: descriptor.type,
         text: generateExerciseText(index),
         label: getExerciseLabel(descriptor),
-        newLetters: descriptor.newLetters,
+        newLetters: [...descriptor.newLetters] as [string, string],
       })
     )
   })

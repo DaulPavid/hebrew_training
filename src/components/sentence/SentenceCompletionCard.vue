@@ -186,6 +186,7 @@ const sentenceParts = computed(() => {
     font-weight: bold;
     padding: 12px 24px;
     border-radius: 8px;
+    direction: ltr;
     animation: pop-in 0.3s ease-out;
 
     @keyframes pop-in {

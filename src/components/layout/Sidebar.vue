@@ -36,15 +36,17 @@ function selectPhraseMode() {
   emit('mode-change', 'phrase')
 }
 
-function selectDictationMode() {
-  exerciseStore.clearExercise()
-  emit('mode-change', 'dictation')
+function resetAllStats() {
+  if (confirm('האם אתה בטוח? כל ההתקדמות תימחק.')) {
+    progressStore.resetProgress()
+    vocabStore.resetProgress()
+  }
 }
 </script>
 
 <template>
   <aside class="sidebar">
-    <h1>עברית</h1>
+    <h1>אימון עברית</h1>
 
     <!-- Mode selector -->
     <div class="sidebar__modes">
@@ -70,10 +72,6 @@ function selectDictationMode() {
       <button class="sidebar__mode-btn" @click="selectPhraseMode">
         <span class="sidebar__mode-icon">💬</span>
         <span>ביטויים</span>
-      </button>
-      <button class="sidebar__mode-btn" @click="selectDictationMode">
-        <span class="sidebar__mode-icon">🎧</span>
-        <span>הכתבה</span>
       </button>
     </div>
 
@@ -106,6 +104,10 @@ function selectDictationMode() {
       :exercises="exerciseStore.textExercises"
       @click="selectTypingMode"
     />
+
+    <button class="sidebar__reset-btn" @click="resetAllStats">
+      איפוס התקדמות
+    </button>
   </aside>
 </template>
 
@@ -128,6 +130,7 @@ function selectDictationMode() {
     font-weight: bold;
     margin: 0 0 24px 0;
     color: #333;
+    align-self: center;
   }
 
   &__modes {
@@ -209,6 +212,26 @@ function selectDictationMode() {
 
   &__list {
     margin-bottom: 16px;
+  }
+
+  &__reset-btn {
+    margin-top: 32px;
+    padding: 10px 16px;
+    background: transparent;
+    border: 1px solid #c9a99a;
+    border-radius: 8px;
+    color: #8a7060;
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-self: center;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: #a08070;
+      color: #6a5040;
+    }
   }
 }
 </style>

@@ -10,7 +10,7 @@ interface WPMReturn {
   /** Current words per minute */
   wpm: Ref<number>
   /** Elapsed time in seconds since first keystroke */
-  elapsedTimeSeconds: ComputedRef<number>
+  elapsedTimeSeconds: Ref<number>
   /** Whether typing is finished */
   isFinished: ComputedRef<boolean>
   /** Reset the WPM timer */
@@ -28,15 +28,11 @@ export function useWPM(
 ): WPMReturn {
   const wpm = ref(0)
   const startTime = ref<number | null>(null)
+  const elapsedTimeSeconds = ref(0)
 
   const isFinished = computed(
     () => typedText.value.length >= targetText.value.length
   )
-
-  const elapsedTimeSeconds = computed(() => {
-    if (startTime.value === null) return 0
-    return (performance.now() - startTime.value) / MS_IN_SECONDS
-  })
 
   // Interval delay: null when finished (stops interval), otherwise refresh rate
   const intervalDelay = computed(() =>
@@ -55,7 +51,10 @@ export function useWPM(
       return
     }
 
-    const elapsed = elapsedTimeSeconds.value
+    // Calculate elapsed time directly (not cached)
+    const elapsed = (performance.now() - startTime.value!) / MS_IN_SECONDS
+    elapsedTimeSeconds.value = elapsed
+
     if (elapsed <= 0) return
 
     // WPM = (correct characters / 5) / minutes
@@ -77,6 +76,7 @@ export function useWPM(
   function resetWPM(): void {
     startTime.value = null
     wpm.value = 0
+    elapsedTimeSeconds.value = 0
   }
 
   return {

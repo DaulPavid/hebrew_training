@@ -39,7 +39,9 @@ function handleClick() {
     :class="{ 'exercise-menu-item--selected': isSelected }"
     @click="handleClick"
   >
-    <div v-if="wpmRecord" class="exercise-menu-item__wpm">{{ wpmRecord }} WPM</div>
+    <div class="exercise-menu-item__wpm" :class="{ 'exercise-menu-item__wpm--pending': !wpmRecord }">
+      {{ wpmRecord ? `${wpmRecord} WPM` : 'ממתין' }}
+    </div>
 
     <template v-if="isLetterExercise">
       <div class="exercise-menu-item__type">{{ typeLabel }}</div>
@@ -65,7 +67,7 @@ function handleClick() {
 <style scoped lang="scss">
 .exercise-menu-item {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr 70px;
   grid-template-rows: repeat(2, auto);
   column-gap: 12px;
   cursor: pointer;
@@ -93,11 +95,19 @@ function handleClick() {
 
   &__wpm {
     font-family: monospace;
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: #716054;
     grid-row: 1 / 3;
     grid-column: 3;
     align-self: center;
+    justify-self: center;
+    text-align: center;
+
+    &--pending {
+      color: #a99588;
+      font-family: 'Noto Sans Hebrew', sans-serif;
+      font-size: 0.8em;
+    }
   }
 
   &__type {

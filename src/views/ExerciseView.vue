@@ -2,11 +2,11 @@
 import { ref, computed, watch } from 'vue'
 import { useExerciseStore } from '@/stores/exerciseStore'
 import { useProgressStore } from '@/stores/progressStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import { useTypingEngine } from '@/composables/useTypingEngine'
 import { useWPM } from '@/composables/useWPM'
 import TextBlock from '@/components/typing/TextBlock.vue'
 import TypingInput from '@/components/typing/TypingInput.vue'
-import KeyboardSvg from '@/components/keyboard/KeyboardSvg.vue'
 import QwertyReference from '@/components/keyboard/QwertyReference.vue'
 import CompletionCard from '@/components/exercises/CompletionCard.vue'
 import HeroSection from '@/components/exercises/HeroSection.vue'
@@ -14,6 +14,7 @@ import { ExerciseType } from '@/data/letterSets'
 
 const exerciseStore = useExerciseStore()
 const progressStore = useProgressStore()
+const settingsStore = useSettingsStore()
 
 // Compute target text from current exercise
 const targetText = computed(() => {
@@ -52,12 +53,6 @@ const currentLetter = computed(() => {
     return undefined
   }
   return targetText.value[currentIndex.value]
-})
-
-// Is this a letter exercise (show keyboard)?
-const isLetterExercise = computed(() => {
-  const type = exerciseStore.currentExercise?.type
-  return type === ExerciseType.REVIEW || type === ExerciseType.PRACTICE
 })
 
 // Exercise title
@@ -123,7 +118,11 @@ function nextExercise() {
 
       <h2 class="exercise-view__title">{{ exerciseTitle }}</h2>
 
-      <TextBlock :letter-states="letterStates" :lines="lines" />
+      <TextBlock
+        :key="exerciseStore.currentExercise?.id"
+        :letter-states="letterStates"
+        :lines="lines"
+      />
 
       <div
         class="exercise-view__wpm"
@@ -155,18 +154,31 @@ function nextExercise() {
         </div>
       </template>
 
-      <!-- Keyboard (for letter exercises) -->
-      <template v-else-if="isLetterExercise">
-        <KeyboardSvg
-          :current-letter="currentLetter"
-          class="exercise-view__keyboard"
-        />
-        <QwertyReference
-          :current-letter="currentLetter"
-          class="exercise-view__qwerty-reference"
-        />
-      </template>
+      <!-- Keyboard display -->
+      <QwertyReference
+        v-if="settingsStore.showKeyboard && !showCompletion"
+        :current-letter="currentLetter"
+        class="exercise-view__keyboard"
+      />
     </template>
+
+    <!-- Fixed keyboard toggle button -->
+    <button
+      v-if="exerciseStore.currentExercise"
+      class="exercise-view__keyboard-toggle"
+      @click="settingsStore.toggleKeyboard"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="4" width="20" height="14" rx="2" />
+        <line x1="6" y1="8" x2="6" y2="8" />
+        <line x1="10" y1="8" x2="10" y2="8" />
+        <line x1="14" y1="8" x2="14" y2="8" />
+        <line x1="18" y1="8" x2="18" y2="8" />
+        <line x1="6" y1="12" x2="6" y2="12" />
+        <line x1="18" y1="12" x2="18" y2="12" />
+        <line x1="8" y1="16" x2="16" y2="16" />
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -201,14 +213,41 @@ function nextExercise() {
     }
   }
 
+  &__keyboard-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      color: #666;
+    }
+
+    &:hover {
+      background: #f5f5f5;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+      svg {
+        color: #2e8f94;
+      }
+    }
+  }
+
   &__keyboard {
     width: 100%;
     max-width: 700px;
     margin-top: 16px;
-  }
-
-  &__qwerty-reference {
-    margin-top: 8px;
   }
 
   &__actions {
