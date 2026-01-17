@@ -2,12 +2,15 @@
 import { ref, computed, watch } from 'vue'
 import type { SentenceExercise } from '@/data/sentences'
 import { useTypingEngine } from '@/composables/useTypingEngine'
+import { useSettingsStore } from '@/stores/settingsStore'
 import Letter from '@/components/typing/Letter.vue'
 import TypingInput from '@/components/typing/TypingInput.vue'
 
 const props = defineProps<{
   sentence: SentenceExercise
 }>()
+
+const settingsStore = useSettingsStore()
 
 const emit = defineEmits<{
   complete: [correct: boolean]
@@ -79,12 +82,20 @@ const sentenceParts = computed(() => {
     <div class="sentence-card__sentence">
       <span class="sentence-card__text">{{ sentenceParts.after }}</span>
       <span class="sentence-card__blank">
-        <Letter
-          v-for="(state, i) in letterStates"
-          :key="i"
-          :char="state.char"
-          :status="state.status"
-        />
+        <!-- Practice mode: show answer with real-time feedback -->
+        <template v-if="settingsStore.practiceMode || showResult">
+          <Letter
+            v-for="(state, i) in letterStates"
+            :key="i"
+            :char="state.char"
+            :status="state.status"
+          />
+        </template>
+        <!-- Test mode: show typed text without revealing answer -->
+        <template v-else>
+          <span v-if="typedText" class="sentence-card__typed">{{ typedText }}</span>
+          <span v-else class="sentence-card__placeholder">___</span>
+        </template>
       </span>
       <span class="sentence-card__text">{{ sentenceParts.before }}</span>
     </div>
@@ -165,6 +176,14 @@ const sentenceParts = computed(() => {
     border-bottom: 3px solid #2e8f94;
     min-width: 100px;
     justify-content: center;
+  }
+
+  &__typed {
+    color: #333;
+  }
+
+  &__placeholder {
+    color: #aaa;
   }
 
   &__hint {

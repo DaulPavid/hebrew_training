@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { Phrase } from '@/data/phrases'
+import type { MinimalPairExercise } from '@/data/minimalPairs'
 import { useTypingEngine } from '@/composables/useTypingEngine'
 import { useSettingsStore } from '@/stores/settingsStore'
 import Letter from '@/components/typing/Letter.vue'
 import TypingInput from '@/components/typing/TypingInput.vue'
 
 const props = defineProps<{
-  phrase: Phrase
+  item: MinimalPairExercise
 }>()
 
 const settingsStore = useSettingsStore()
@@ -16,8 +16,8 @@ const emit = defineEmits<{
   complete: [correct: boolean, accuracy: number]
 }>()
 
-// Target text is the Hebrew phrase
-const targetText = computed(() => props.phrase.hebrew)
+// Target text is the target word
+const targetText = computed(() => props.item.targetWord)
 
 // Set up typing engine
 const {
@@ -45,9 +45,9 @@ watch(isComplete, (complete) => {
   }
 })
 
-// Reset when phrase changes
+// Reset when item changes
 watch(
-  () => props.phrase.id,
+  () => props.item.id,
   () => {
     reset()
     showResult.value = false
@@ -57,25 +57,35 @@ watch(
 </script>
 
 <template>
-  <div class="phrase-card">
+  <div class="minimal-pair-card">
     <TypingInput
       v-model="typedText"
       :disabled="showResult"
       @update:model-value="handleInput"
     />
 
-    <!-- English meaning -->
-    <div class="phrase-card__english">
-      {{ phrase.english }}
+    <!-- Letter focus -->
+    <div class="minimal-pair-card__focus">
+      <span class="minimal-pair-card__focus-letter">{{ item.focusLetter }}</span>
+      <span class="minimal-pair-card__focus-vs">vs</span>
+      <span class="minimal-pair-card__confused-letter">{{ item.confusedLetter }}</span>
     </div>
 
-    <!-- Transliteration hint -->
-    <div v-if="!showResult" class="phrase-card__hint">
-      {{ phrase.transliteration }}
+    <!-- Target word info -->
+    <div class="minimal-pair-card__target">
+      <span class="minimal-pair-card__translit">"{{ item.targetTranslit }}"</span>
+      <span class="minimal-pair-card__english">{{ item.english }}</span>
     </div>
 
-    <!-- Hebrew phrase with feedback -->
-    <div class="phrase-card__hebrew">
+    <!-- Warning: confused word -->
+    <div class="minimal-pair-card__warning">
+      <span class="minimal-pair-card__warning-label">Not:</span>
+      <span class="minimal-pair-card__warning-word">{{ item.confusedWith }}</span>
+      <span class="minimal-pair-card__warning-info">({{ item.confusedTranslit }} - {{ item.confusedEnglish }})</span>
+    </div>
+
+    <!-- Hebrew typing area -->
+    <div class="minimal-pair-card__hebrew">
       <!-- Practice mode: show answer with real-time feedback -->
       <template v-if="settingsStore.practiceMode || showResult">
         <Letter
@@ -87,52 +97,114 @@ watch(
       </template>
       <!-- Test mode: show typed text without revealing answer -->
       <template v-else>
-        <span v-if="typedText" class="phrase-card__typed">{{ typedText }}</span>
-        <span v-else class="phrase-card__placeholder">???</span>
+        <span v-if="typedText" class="minimal-pair-card__typed">{{ typedText }}</span>
+        <span v-else class="minimal-pair-card__placeholder">???</span>
       </template>
     </div>
 
     <!-- Result feedback -->
     <div
       v-if="showResult"
-      class="phrase-card__result"
+      class="minimal-pair-card__result"
       :class="{
-        'phrase-card__result--correct': wasCorrect,
-        'phrase-card__result--incorrect': !wasCorrect
+        'minimal-pair-card__result--correct': wasCorrect,
+        'minimal-pair-card__result--incorrect': !wasCorrect
       }"
     >
       <span v-if="wasCorrect">{{ accuracy }}% - Excellent!</span>
-      <span v-else>
-        {{ accuracy }}% - Keep practicing!
-      </span>
+      <span v-else>{{ accuracy }}% - Keep practicing!</span>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.phrase-card {
+.minimal-pair-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   padding: 32px 48px;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 450px;
+  min-width: 420px;
 
-  &__english {
-    font-size: 1.8em;
+  &__focus {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 24px;
+    background: #f0f9ff;
+    border-radius: 8px;
+  }
+
+  &__focus-letter {
+    font-size: 2em;
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    font-weight: bold;
+    color: #2e8f94;
+  }
+
+  &__focus-vs {
+    font-size: 1em;
+    color: #888;
+    font-style: italic;
+  }
+
+  &__confused-letter {
+    font-size: 2em;
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    font-weight: bold;
+    color: #dc2626;
+  }
+
+  &__target {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__translit {
+    font-size: 1.5em;
     font-weight: bold;
     color: #333;
-    text-align: center;
     direction: ltr;
   }
 
-  &__hint {
+  &__english {
     font-size: 1.1em;
-    color: #888;
-    font-style: italic;
+    color: #666;
+    direction: ltr;
+  }
+
+  &__warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #fef2f2;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+  }
+
+  &__warning-label {
+    font-size: 0.9em;
+    color: #dc2626;
+    font-weight: bold;
+    direction: ltr;
+  }
+
+  &__warning-word {
+    font-size: 1.2em;
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    color: #dc2626;
+    direction: rtl;
+  }
+
+  &__warning-info {
+    font-size: 0.85em;
+    color: #991b1b;
     direction: ltr;
   }
 
@@ -148,7 +220,7 @@ watch(
     background: #f8f9fa;
     border-radius: 12px;
     min-height: 80px;
-    min-width: 300px;
+    min-width: 150px;
     align-items: center;
     justify-content: center;
   }

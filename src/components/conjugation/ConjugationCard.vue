@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { Phrase } from '@/data/phrases'
+import type { VerbExercise } from '@/data/verbs'
+import { getTenseLabel } from '@/data/verbs'
 import { useTypingEngine } from '@/composables/useTypingEngine'
-import { useSettingsStore } from '@/stores/settingsStore'
 import Letter from '@/components/typing/Letter.vue'
 import TypingInput from '@/components/typing/TypingInput.vue'
 
 const props = defineProps<{
-  phrase: Phrase
+  item: VerbExercise
 }>()
-
-const settingsStore = useSettingsStore()
 
 const emit = defineEmits<{
   complete: [correct: boolean, accuracy: number]
 }>()
 
-// Target text is the Hebrew phrase
-const targetText = computed(() => props.phrase.hebrew)
+// Target text is the conjugated form
+const targetText = computed(() => props.item.conjugated)
 
 // Set up typing engine
 const {
@@ -45,9 +43,9 @@ watch(isComplete, (complete) => {
   }
 })
 
-// Reset when phrase changes
+// Reset when item changes
 watch(
-  () => props.phrase.id,
+  () => props.item.id,
   () => {
     reset()
     showResult.value = false
@@ -57,83 +55,123 @@ watch(
 </script>
 
 <template>
-  <div class="phrase-card">
+  <div class="conjugation-card">
     <TypingInput
       v-model="typedText"
       :disabled="showResult"
       @update:model-value="handleInput"
     />
 
-    <!-- English meaning -->
-    <div class="phrase-card__english">
-      {{ phrase.english }}
+    <!-- Infinitive verb -->
+    <div class="conjugation-card__infinitive">
+      {{ item.infinitive }}
     </div>
 
-    <!-- Transliteration hint -->
-    <div v-if="!showResult" class="phrase-card__hint">
-      {{ phrase.transliteration }}
+    <!-- English and transliteration -->
+    <div class="conjugation-card__info">
+      <span class="conjugation-card__translit">{{ item.infinitiveTranslit }}</span>
+      <span class="conjugation-card__english">{{ item.english }}</span>
     </div>
 
-    <!-- Hebrew phrase with feedback -->
-    <div class="phrase-card__hebrew">
-      <!-- Practice mode: show answer with real-time feedback -->
-      <template v-if="settingsStore.practiceMode || showResult">
-        <Letter
-          v-for="(state, i) in letterStates"
-          :key="i"
-          :char="state.char"
-          :status="state.status"
-        />
-      </template>
-      <!-- Test mode: show typed text without revealing answer -->
-      <template v-else>
-        <span v-if="typedText" class="phrase-card__typed">{{ typedText }}</span>
-        <span v-else class="phrase-card__placeholder">???</span>
-      </template>
+    <!-- Conjugation prompt -->
+    <div class="conjugation-card__prompt">
+      <span class="conjugation-card__person">{{ item.person }}</span>
+      <span class="conjugation-card__tense">{{ getTenseLabel(item.tense) }}</span>
+    </div>
+
+    <!-- Conjugated form typing area -->
+    <div class="conjugation-card__hebrew">
+      <Letter
+        v-for="(state, i) in letterStates"
+        :key="i"
+        :char="state.char"
+        :status="state.status"
+      />
+    </div>
+
+    <!-- Hint (before result) -->
+    <div v-if="!showResult" class="conjugation-card__hint">
+      {{ item.conjugatedTranslit }}
     </div>
 
     <!-- Result feedback -->
     <div
       v-if="showResult"
-      class="phrase-card__result"
+      class="conjugation-card__result"
       :class="{
-        'phrase-card__result--correct': wasCorrect,
-        'phrase-card__result--incorrect': !wasCorrect
+        'conjugation-card__result--correct': wasCorrect,
+        'conjugation-card__result--incorrect': !wasCorrect
       }"
     >
       <span v-if="wasCorrect">{{ accuracy }}% - Excellent!</span>
-      <span v-else>
-        {{ accuracy }}% - Keep practicing!
-      </span>
+      <span v-else>{{ accuracy }}% - Keep practicing!</span>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.phrase-card {
+.conjugation-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   padding: 32px 48px;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 450px;
+  min-width: 400px;
 
-  &__english {
-    font-size: 1.8em;
+  &__infinitive {
+    font-size: 2.2em;
+    font-family: 'Noto Sans Hebrew', sans-serif;
     font-weight: bold;
     color: #333;
-    text-align: center;
-    direction: ltr;
+    direction: rtl;
   }
 
-  &__hint {
+  &__info {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  &__translit {
     font-size: 1.1em;
     color: #888;
     font-style: italic;
     direction: ltr;
+  }
+
+  &__english {
+    font-size: 1.1em;
+    color: #666;
+    direction: ltr;
+  }
+
+  &__prompt {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 20px;
+    background: #e8f4f5;
+    border-radius: 8px;
+    margin: 8px 0;
+  }
+
+  &__person {
+    font-size: 1.3em;
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    font-weight: bold;
+    color: #2e8f94;
+  }
+
+  &__tense {
+    font-size: 1.1em;
+    font-family: 'Noto Sans Hebrew', sans-serif;
+    color: #666;
+    padding: 4px 12px;
+    background: white;
+    border-radius: 4px;
   }
 
   &__hebrew {
@@ -148,18 +186,16 @@ watch(
     background: #f8f9fa;
     border-radius: 12px;
     min-height: 80px;
-    min-width: 300px;
+    min-width: 200px;
     align-items: center;
     justify-content: center;
   }
 
-  &__typed {
-    color: #333;
-  }
-
-  &__placeholder {
-    color: #aaa;
+  &__hint {
+    font-size: 1em;
+    color: #999;
     font-style: italic;
+    direction: ltr;
   }
 
   &__result {

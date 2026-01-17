@@ -9,7 +9,7 @@ const progressStore = useProgressStore()
 const vocabStore = useVocabStore()
 
 const emit = defineEmits<{
-  'mode-change': [mode: 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation']
+  'mode-change': [mode: 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation' | 'conjugation' | 'plural' | 'number' | 'root' | 'minimalPair']
 }>()
 
 function selectTypingMode() {
@@ -34,6 +34,31 @@ function selectSentenceMode() {
 function selectPhraseMode() {
   exerciseStore.clearExercise()
   emit('mode-change', 'phrase')
+}
+
+function selectConjugationMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'conjugation')
+}
+
+function selectPluralMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'plural')
+}
+
+function selectNumberMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'number')
+}
+
+function selectRootMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'root')
+}
+
+function selectMinimalPairMode() {
+  exerciseStore.clearExercise()
+  emit('mode-change', 'minimalPair')
 }
 
 function resetAllStats() {
@@ -72,6 +97,26 @@ function resetAllStats() {
       <button class="sidebar__mode-btn" @click="selectPhraseMode">
         <span class="sidebar__mode-icon">💬</span>
         <span>ביטויים</span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectConjugationMode">
+        <span class="sidebar__mode-icon">📝</span>
+        <span>הטיית פעלים</span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectPluralMode">
+        <span class="sidebar__mode-icon">📚</span>
+        <span>יחיד ורבים</span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectNumberMode">
+        <span class="sidebar__mode-icon">🔢</span>
+        <span>מספרים</span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectRootMode">
+        <span class="sidebar__mode-icon">🌱</span>
+        <span>שורשים</span>
+      </button>
+      <button class="sidebar__mode-btn" @click="selectMinimalPairMode">
+        <span class="sidebar__mode-icon">🔤</span>
+        <span>אותיות דומות</span>
       </button>
     </div>
 

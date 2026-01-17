@@ -8,11 +8,16 @@ import TranslationView from '@/views/TranslationView.vue'
 import SentenceCompletionView from '@/views/SentenceCompletionView.vue'
 import PhraseTypingView from '@/views/PhraseTypingView.vue'
 import DictationView from '@/views/DictationView.vue'
+import ConjugationView from '@/views/ConjugationView.vue'
+import PluralView from '@/views/PluralView.vue'
+import NumberView from '@/views/NumberView.vue'
+import RootView from '@/views/RootView.vue'
+import MinimalPairView from '@/views/MinimalPairView.vue'
 
 const exerciseStore = useExerciseStore()
 
 // Current mode
-type AppMode = 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation'
+type AppMode = 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation' | 'conjugation' | 'plural' | 'number' | 'root' | 'minimalPair'
 const currentMode = ref<AppMode>('typing')
 
 // Handle mode change from sidebar
@@ -39,6 +44,11 @@ watch(
     <SentenceCompletionView v-else-if="currentMode === 'sentence'" />
     <PhraseTypingView v-else-if="currentMode === 'phrase'" />
     <DictationView v-else-if="currentMode === 'dictation'" />
+    <ConjugationView v-else-if="currentMode === 'conjugation'" />
+    <PluralView v-else-if="currentMode === 'plural'" />
+    <NumberView v-else-if="currentMode === 'number'" />
+    <RootView v-else-if="currentMode === 'root'" />
+    <MinimalPairView v-else-if="currentMode === 'minimalPair'" />
   </AppLayout>
 </template>
 

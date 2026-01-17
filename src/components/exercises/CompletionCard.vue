@@ -26,7 +26,7 @@ const formattedAccuracy = computed(() => Math.round(props.accuracy))
 
     <div class="completion-card__stats">
       <p>{{ formattedWpm }} WPM</p>
-      <p>{{ formattedAccuracy }}% דיוק</p>
+      <p>דיוק {{ formattedAccuracy }}%</p>
     </div>
   </div>
 </template>

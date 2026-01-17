@@ -1,0 +1,22 @@
+[
+  { "id": "mp-1", "targetWord": "חבר", "targetTranslit": "chaver", "english": "friend", "confusedWith": "כבר", "confusedTranslit": "kvar", "confusedEnglish": "already", "focusLetter": "ח", "confusedLetter": "כ" },
+  { "id": "mp-2", "targetWord": "כבר", "targetTranslit": "kvar", "english": "already", "confusedWith": "חבר", "confusedTranslit": "chaver", "confusedEnglish": "friend", "focusLetter": "כ", "confusedLetter": "ח" },
+  { "id": "mp-3", "targetWord": "חם", "targetTranslit": "cham", "english": "hot", "confusedWith": "כם", "confusedTranslit": "kam", "confusedEnglish": "(not a word)", "focusLetter": "ח", "confusedLetter": "כ" },
+  { "id": "mp-4", "targetWord": "חיים", "targetTranslit": "chayim", "english": "life", "confusedWith": "כיים", "confusedTranslit": "kayim", "confusedEnglish": "(not a word)", "focusLetter": "ח", "confusedLetter": "כ" },
+  { "id": "mp-5", "targetWord": "עבר", "targetTranslit": "avar", "english": "passed/past", "confusedWith": "אבר", "confusedTranslit": "ever", "confusedEnglish": "limb", "focusLetter": "ע", "confusedLetter": "א" },
+  { "id": "mp-6", "targetWord": "עין", "targetTranslit": "ayin", "english": "eye", "confusedWith": "אין", "confusedTranslit": "ein", "confusedEnglish": "there is no", "focusLetter": "ע", "confusedLetter": "א" },
+  { "id": "mp-7", "targetWord": "ערב", "targetTranslit": "erev", "english": "evening", "confusedWith": "ארב", "confusedTranslit": "arav", "confusedEnglish": "ambushed", "focusLetter": "ע", "confusedLetter": "א" },
+  { "id": "mp-8", "targetWord": "אמר", "targetTranslit": "amar", "english": "said", "confusedWith": "עמר", "confusedTranslit": "omer", "confusedEnglish": "(name)", "focusLetter": "א", "confusedLetter": "ע" },
+  { "id": "mp-9", "targetWord": "טוב", "targetTranslit": "tov", "english": "good", "confusedWith": "תוב", "confusedTranslit": "tuv", "confusedEnglish": "(not a word)", "focusLetter": "ט", "confusedLetter": "ת" },
+  { "id": "mp-10", "targetWord": "תודה", "targetTranslit": "toda", "english": "thank you", "confusedWith": "טודה", "confusedTranslit": "toda", "confusedEnglish": "(not a word)", "focusLetter": "ת", "confusedLetter": "ט" },
+  { "id": "mp-11", "targetWord": "שם", "targetTranslit": "sham", "english": "there/name", "confusedWith": "סם", "confusedTranslit": "sam", "confusedEnglish": "drug/put", "focusLetter": "ש", "confusedLetter": "ס" },
+  { "id": "mp-12", "targetWord": "סוף", "targetTranslit": "sof", "english": "end", "confusedWith": "שוף", "confusedTranslit": "shuf", "confusedEnglish": "(not a word)", "focusLetter": "ס", "confusedLetter": "ש" },
+  { "id": "mp-13", "targetWord": "שלום", "targetTranslit": "shalom", "english": "peace/hello", "confusedWith": "סלום", "confusedTranslit": "salom", "confusedEnglish": "(not a word)", "focusLetter": "ש", "confusedLetter": "ס" },
+  { "id": "mp-14", "targetWord": "קל", "targetTranslit": "kal", "english": "easy/light", "confusedWith": "כל", "confusedTranslit": "kol", "confusedEnglish": "all/every", "focusLetter": "ק", "confusedLetter": "כ" },
+  { "id": "mp-15", "targetWord": "כלב", "targetTranslit": "kelev", "english": "dog", "confusedWith": "קלב", "confusedTranslit": "kalev", "confusedEnglish": "(not a word)", "focusLetter": "כ", "confusedLetter": "ק" },
+  { "id": "mp-16", "targetWord": "קר", "targetTranslit": "kar", "english": "cold", "confusedWith": "כר", "confusedTranslit": "kar", "confusedEnglish": "pillow", "focusLetter": "ק", "confusedLetter": "כ" },
+  { "id": "mp-17", "targetWord": "וו", "targetTranslit": "vav", "english": "hook", "confusedWith": "בו", "confusedTranslit": "bo", "confusedEnglish": "in him", "focusLetter": "ו", "confusedLetter": "ב" },
+  { "id": "mp-18", "targetWord": "בית", "targetTranslit": "bayit", "english": "house", "confusedWith": "וית", "confusedTranslit": "vayit", "confusedEnglish": "(not a word)", "focusLetter": "ב", "confusedLetter": "ו" },
+  { "id": "mp-19", "targetWord": "חוף", "targetTranslit": "chof", "english": "beach", "confusedWith": "כוף", "confusedTranslit": "kof", "confusedEnglish": "(not a word)", "focusLetter": "ח", "confusedLetter": "כ" },
+  { "id": "mp-20", "targetWord": "עוד", "targetTranslit": "od", "english": "more/still", "confusedWith": "אוד", "confusedTranslit": "ud", "confusedEnglish": "ember", "focusLetter": "ע", "confusedLetter": "א" }
+]

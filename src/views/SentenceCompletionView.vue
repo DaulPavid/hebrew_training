@@ -4,6 +4,7 @@ import { getRandomSentences, type SentenceExercise } from '@/data/sentences'
 import { useSettingsStore } from '@/stores/settingsStore'
 import SentenceCompletionCard from '@/components/sentence/SentenceCompletionCard.vue'
 import QwertyReference from '@/components/keyboard/QwertyReference.vue'
+import PracticeTestToggle from '@/components/common/PracticeTestToggle.vue'
 
 const settingsStore = useSettingsStore()
 
@@ -58,6 +59,7 @@ onMounted(() => {
     <div class="sentence-view__header">
       <h1>השלמת משפטים</h1>
       <p class="sentence-view__subtitle">Complete the Hebrew sentence</p>
+      <PracticeTestToggle class="sentence-view__mode-toggle" />
       <div class="sentence-view__stats">
         <div class="sentence-view__stat">
           <span class="sentence-view__stat-value">{{ completedCount }}</span>

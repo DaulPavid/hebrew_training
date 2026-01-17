@@ -4,6 +4,7 @@ import { getRandomPhrases, type Phrase } from '@/data/phrases'
 import { useSettingsStore } from '@/stores/settingsStore'
 import PhraseTypingCard from '@/components/phrase/PhraseTypingCard.vue'
 import QwertyReference from '@/components/keyboard/QwertyReference.vue'
+import PracticeTestToggle from '@/components/common/PracticeTestToggle.vue'
 
 const settingsStore = useSettingsStore()
 
@@ -56,6 +57,7 @@ onMounted(() => {
     <div class="phrase-view__header">
       <h1>הקלדת ביטויים</h1>
       <p class="phrase-view__subtitle">Type common Hebrew phrases</p>
+      <PracticeTestToggle class="phrase-view__mode-toggle" />
       <div class="phrase-view__stats">
         <div class="phrase-view__stat">
           <span class="phrase-view__stat-value">{{ completedCount }}</span>

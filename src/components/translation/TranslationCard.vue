@@ -2,12 +2,15 @@
 import { ref, computed, watch } from 'vue'
 import type { VocabItem } from '@/types'
 import { useTypingEngine } from '@/composables/useTypingEngine'
+import { useSettingsStore } from '@/stores/settingsStore'
 import Letter from '@/components/typing/Letter.vue'
 import TypingInput from '@/components/typing/TypingInput.vue'
 
 const props = defineProps<{
   item: VocabItem
 }>()
+
+const settingsStore = useSettingsStore()
 
 const emit = defineEmits<{
   complete: [correct: boolean, accuracy: number]
@@ -70,12 +73,20 @@ watch(
     <!-- Hebrew answer area -->
     <div class="translation-card__answer">
       <div class="translation-card__hebrew">
-        <Letter
-          v-for="(state, i) in letterStates"
-          :key="i"
-          :char="state.char"
-          :status="state.status"
-        />
+        <!-- Practice mode: show answer with real-time feedback -->
+        <template v-if="settingsStore.practiceMode || showResult">
+          <Letter
+            v-for="(state, i) in letterStates"
+            :key="i"
+            :char="state.char"
+            :status="state.status"
+          />
+        </template>
+        <!-- Test mode: show typed text without revealing answer -->
+        <template v-else>
+          <span v-if="typedText" class="translation-card__typed">{{ typedText }}</span>
+          <span v-else class="translation-card__placeholder">???</span>
+        </template>
       </div>
       <div v-if="!showResult" class="translation-card__hint">
         ({{ item.transliteration }})
@@ -154,6 +165,15 @@ watch(
     min-width: 200px;
     align-items: center;
     justify-content: center;
+  }
+
+  &__typed {
+    color: #333;
+  }
+
+  &__placeholder {
+    color: #aaa;
+    font-style: italic;
   }
 
   &__hint {

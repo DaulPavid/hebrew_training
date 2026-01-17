@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import Sidebar from './Sidebar.vue'
 
+type AppMode = 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation' | 'conjugation' | 'plural' | 'number' | 'root' | 'minimalPair'
+
 const emit = defineEmits<{
-  'mode-change': [mode: 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation']
+  'mode-change': [mode: AppMode]
 }>()
 
-function handleModeChange(mode: 'typing' | 'vocab' | 'translation' | 'sentence' | 'phrase' | 'dictation') {
+function handleModeChange(mode: AppMode) {
   emit('mode-change', mode)
 }
 </script>

@@ -4,6 +4,7 @@ import { useVocabStore } from '@/stores/vocabStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import VocabCard from '@/components/vocab/VocabCard.vue'
 import QwertyReference from '@/components/keyboard/QwertyReference.vue'
+import PracticeTestToggle from '@/components/common/PracticeTestToggle.vue'
 
 const vocabStore = useVocabStore()
 const settingsStore = useSettingsStore()
@@ -34,6 +35,7 @@ function startNewSession() {
     <!-- Header with stats -->
     <div class="vocab-drill__header">
       <h1>תרגול אוצר מילים</h1>
+      <PracticeTestToggle class="vocab-drill__mode-toggle" />
       <div class="vocab-drill__stats">
         <div class="vocab-drill__stat">
           <span class="vocab-drill__stat-value">{{ vocabStore.learnedCount }}</span>

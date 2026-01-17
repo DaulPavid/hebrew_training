@@ -1,57 +1,83 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
-import { useVocabStore } from '@/stores/vocabStore'
+import { ref, computed, onMounted } from 'vue'
+import { getRandomMinimalPairs, type MinimalPairExercise } from '@/data/minimalPairs'
 import { useSettingsStore } from '@/stores/settingsStore'
-import TranslationCard from '@/components/translation/TranslationCard.vue'
+import MinimalPairCard from '@/components/minimalPair/MinimalPairCard.vue'
 import QwertyReference from '@/components/keyboard/QwertyReference.vue'
 import PracticeTestToggle from '@/components/common/PracticeTestToggle.vue'
 
-const vocabStore = useVocabStore()
 const settingsStore = useSettingsStore()
 
-// Start session on mount
-onMounted(() => {
-  vocabStore.startSession()
+// Session settings
+const SESSION_SIZE = 10
+
+// Session state
+const queue = ref<MinimalPairExercise[]>([])
+const completedCount = ref(0)
+const correctCount = ref(0)
+
+// Current item
+const currentItem = computed(() => queue.value[0] ?? null)
+
+// Is session complete?
+const isSessionComplete = computed(() => {
+  return completedCount.value > 0 && queue.value.length === 0
 })
 
-// Handle card completion
-function handleComplete(correct: boolean) {
-  vocabStore.recordAnswer(correct)
-}
-
-// Session complete view
-const isSessionComplete = computed(() => {
-  return !vocabStore.hasMoreToReview && vocabStore.sessionStats.total > 0
+// Accuracy percentage
+const sessionAccuracy = computed(() => {
+  if (completedCount.value === 0) return 0
+  return Math.round((correctCount.value / completedCount.value) * 100)
 })
 
 // Start a new session
-function startNewSession() {
-  vocabStore.startSession()
+function startSession() {
+  queue.value = getRandomMinimalPairs(SESSION_SIZE)
+  completedCount.value = 0
+  correctCount.value = 0
 }
+
+// Handle completion
+function handleComplete(correct: boolean) {
+  completedCount.value++
+  if (correct) {
+    correctCount.value++
+  }
+  queue.value = queue.value.slice(1)
+}
+
+// Start on mount
+onMounted(() => {
+  startSession()
+})
 </script>
 
 <template>
-  <div class="translation-view">
-    <!-- Header with stats -->
-    <div class="translation-view__header">
-      <h1>תרגום לעברית</h1>
-      <p class="translation-view__subtitle">Type the Hebrew translation</p>
-      <PracticeTestToggle class="translation-view__mode-toggle" />
-      <div class="translation-view__stats">
-        <div class="translation-view__stat">
-          <span class="translation-view__stat-value">{{ vocabStore.sessionStats.total }}</span>
-          <span class="translation-view__stat-label">תורגמו</span>
+  <div class="minimal-pair-view">
+    <!-- Header -->
+    <div class="minimal-pair-view__header">
+      <h1>אותיות דומות</h1>
+      <p class="minimal-pair-view__subtitle">Type the correct word</p>
+      <PracticeTestToggle class="minimal-pair-view__mode-toggle" />
+      <div class="minimal-pair-view__stats">
+        <div class="minimal-pair-view__stat">
+          <span class="minimal-pair-view__stat-value">{{ completedCount }}</span>
+          <span class="minimal-pair-view__stat-label">הושלמו</span>
         </div>
-        <div class="translation-view__stat">
-          <span class="translation-view__stat-value">{{ vocabStore.sessionStats.remaining }}</span>
-          <span class="translation-view__stat-label">נותרו</span>
+        <div class="minimal-pair-view__stat">
+          <span class="minimal-pair-view__stat-value">{{ queue.length }}</span>
+          <span class="minimal-pair-view__stat-label">נותרו</span>
+        </div>
+        <div class="minimal-pair-view__stat">
+          <span class="minimal-pair-view__stat-value">{{ sessionAccuracy }}%</span>
+          <span class="minimal-pair-view__stat-label">דיוק</span>
         </div>
       </div>
     </div>
 
     <!-- Session complete -->
-    <div v-if="isSessionComplete" class="translation-view__complete">
-      <svg class="translation-view__trophy" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <div v-if="isSessionComplete" class="minimal-pair-view__complete">
+      <svg class="minimal-pair-view__trophy" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M32 8L38 24H54L41 34L47 50L32 40L17 50L23 34L10 24H26L32 8Z"
           fill="#fbbf24"
@@ -59,55 +85,54 @@ function startNewSession() {
           stroke-width="2"
         />
       </svg>
-      <h2>מצוין!</h2>
-      <p>סיימת את תרגול התרגום</p>
-      <div class="translation-view__session-stats">
-        <p>מילים חדשות: {{ vocabStore.sessionStats.newLearned }}</p>
-        <p>חזרות: {{ vocabStore.sessionStats.reviewed }}</p>
+      <h2>כל הכבוד!</h2>
+      <p>סיימת את תרגול האותיות הדומות</p>
+      <div class="minimal-pair-view__session-stats">
+        <p>נכונים: {{ correctCount }} / {{ completedCount }}</p>
+        <p>דיוק: {{ sessionAccuracy }}%</p>
       </div>
-      <button class="translation-view__btn" @click="startNewSession">
+      <button class="minimal-pair-view__btn" @click="startSession">
         התחל שוב
       </button>
     </div>
 
-    <!-- No items to review -->
-    <div v-else-if="!vocabStore.currentItem" class="translation-view__empty">
-      <h2>אין מילים לתרגום</h2>
-      <p>חזור מאוחר יותר או התחל מחדש</p>
-      <button class="translation-view__btn" @click="startNewSession">
+    <!-- No items -->
+    <div v-else-if="!currentItem" class="minimal-pair-view__empty">
+      <h2>אין פריטים</h2>
+      <button class="minimal-pair-view__btn" @click="startSession">
         התחל תרגול
       </button>
     </div>
 
-    <!-- Active translation -->
-    <TranslationCard
+    <!-- Active card -->
+    <MinimalPairCard
       v-else
-      :key="vocabStore.currentItem.id"
-      :item="vocabStore.currentItem"
+      :key="currentItem.id"
+      :item="currentItem"
       @complete="handleComplete"
     />
 
     <!-- Progress bar -->
-    <div v-if="vocabStore.currentItem" class="translation-view__progress">
-      <div class="translation-view__progress-bar">
+    <div v-if="currentItem" class="minimal-pair-view__progress">
+      <div class="minimal-pair-view__progress-bar">
         <div
-          class="translation-view__progress-fill"
-          :style="{ width: `${(vocabStore.sessionStats.total / (vocabStore.sessionStats.total + vocabStore.sessionStats.remaining)) * 100}%` }"
+          class="minimal-pair-view__progress-fill"
+          :style="{ width: `${(completedCount / SESSION_SIZE) * 100}%` }"
         />
       </div>
-      <span class="translation-view__progress-text">
-        {{ vocabStore.sessionStats.total }} / {{ vocabStore.sessionStats.total + vocabStore.sessionStats.remaining }}
+      <span class="minimal-pair-view__progress-text">
+        {{ completedCount }} / {{ SESSION_SIZE }}
       </span>
     </div>
 
     <!-- Keyboard display -->
     <QwertyReference
       v-if="settingsStore.showKeyboard"
-      class="translation-view__keyboard"
+      class="minimal-pair-view__keyboard"
     />
 
     <!-- Fixed keyboard toggle button -->
-    <button class="translation-view__keyboard-toggle" @click="settingsStore.toggleKeyboard">
+    <button class="minimal-pair-view__keyboard-toggle" @click="settingsStore.toggleKeyboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="2" y="4" width="20" height="14" rx="2" />
         <line x1="6" y1="8" x2="6" y2="8" />
@@ -123,7 +148,7 @@ function startNewSession() {
 </template>
 
 <style scoped lang="scss">
-.translation-view {
+.minimal-pair-view {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -254,6 +279,41 @@ function startNewSession() {
     }
   }
 
+  &__progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  &__progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2e8f94, #3db8bd);
+    border-radius: 4px;
+    transition: width 0.3s ease-out;
+  }
+
+  &__progress-text {
+    font-size: 0.9em;
+    color: #666;
+    direction: ltr;
+  }
+
+  &__keyboard {
+    width: 100%;
+    max-width: 700px;
+  }
+
   &__keyboard-toggle {
     position: fixed;
     bottom: 20px;
@@ -283,41 +343,6 @@ function startNewSession() {
         color: #2e8f94;
       }
     }
-  }
-
-  &__keyboard {
-    width: 100%;
-    max-width: 700px;
-  }
-
-  &__progress {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    max-width: 400px;
-  }
-
-  &__progress-bar {
-    width: 100%;
-    height: 8px;
-    background: #e9ecef;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  &__progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #2e8f94, #3db8bd);
-    border-radius: 4px;
-    transition: width 0.3s ease-out;
-  }
-
-  &__progress-text {
-    font-size: 0.9em;
-    color: #666;
-    direction: ltr;
   }
 }
 </style>
