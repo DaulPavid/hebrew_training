@@ -4,7 +4,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/hebrew-training/',
+  base: '/hebrew_training/',
   plugins: [vue()],
   resolve: {
     alias: {
